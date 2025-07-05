@@ -1,70 +1,103 @@
-let taskInput = document.getElementById("taskInput");
-let addTaskBtn = document.getElementById("addTask");
-let taskList = document.getElementById("taskList");
+const taskInput = document.getElementById("taskInput");
+const addTaskBtn = document.getElementById("addTask");
+const taskList = document.getElementById("taskList");
+const clearBtn = document.getElementById("clearBtn");
 
-addTaskBtn.addEventListener("click", function () {
-    let task = taskInput.value;
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    if (task === "") {
-        alert("Please enter a task.");
-        return;
-    }
+// Re-render tasks from LocalStorage
+const renderTasks = () => {
+  taskList.innerHTML = ""; // clear list first
 
-let li = document.createElement("li");
-let checkbox = document.createElement("input");
+  tasks.forEach((task, index) => {
+    const li = document.createElement("li");
 
+    // Create container for task text and date
+    const taskContainer = document.createElement("div");
+    taskContainer.style.display = "inline-block";
 
-    checkbox.type = "checkbox";
-    checkbox.textContent = "task";
+    // Task text
+    const taskText = document.createElement("span");
+    taskText.textContent = task.text;
+    taskText.style.display = "block";
+    taskText.style.cursor = "default";
 
-let text= document.createTextNode("" + task);
+    // Task date
+    const taskDate = document.createElement("small");
+    taskDate.textContent = task.date;
+    taskDate.style.display = "block";
+    taskDate.style.color = "#888"; // optional style
 
-    li.appendChild(checkbox);
-    li.appendChild(text);
-    taskList.appendChild(li);
-    taskInput.value = ""; //clear input
+    taskContainer.appendChild(taskText);
+    taskContainer.appendChild(taskDate);
 
-//Remove task when double clicked
-    li.addEventListener("dblclick", function () {
-            li.remove();
-        });
+    // Edit icon
+    const editIcon = document.createElement("img");
+    editIcon.src = "icons8-pencil.png";
+    editIcon.alt = "Edit";
+    editIcon.className = "edit-icon";
 
- //Edit task when clicked
-    li.addEventListener("click", function (e) {
-        if (e.target.tagName === "INPUT") return;
+    // Edit on click
+    editIcon.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = task.text;
+      input.className = "edit-input";
 
-            let currentText = text.textContent;
-            let input = document.createElement("input");
+      const save = () => {
+        const newValue = input.value.trim();
+        if (newValue !== "") {
+          tasks[index].text = newValue;
+          localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+        renderTasks();
+      };
 
-            input.type = "text";
-            input.value = currentText;
-            input.className = "edit-input";
+      input.addEventListener("blur", save);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") save();
+      });
 
-            li.innerHTML = "";
-            li.appendChild(checkbox);
-            li.appendChild(input);
-            input.focus();
-
-        //Save task on Enter
-            function saveEdit() {
-                let newTask = input.value || currentText;
-                let checkbox = document.createElement("input");
-                let textNode = document.createTextNode(""+ newTask);
-
-                    li.innerHTML = "";
-                    checkbox.type = "checkbox";
-                    checkbox.name = "task";
-
-                    li.appendChild(checkbox);
-                    li.appendChild(textNode);
-            }
-
-            input.addEventListener("blur", saveEdit );
-
-            input.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                input.blur(); //triggers blur to save
-            }
-        });
+      taskContainer.replaceChild(input, taskText);
+      input.focus();
     });
+
+    // Double-click to remove task
+    li.addEventListener("dblclick", () => {
+      tasks.splice(index, 1);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      renderTasks();
+    });
+
+    li.appendChild(taskContainer);
+    li.appendChild(editIcon);
+    taskList.appendChild(li);
+  });
+};
+
+
+addTaskBtn.addEventListener("click", () => {
+  const task = taskInput.value.trim();
+  if (task === "") {
+    alert("Enter a task");
+    return;
+  }
+
+  tasks.push({ text: task, date: new Date().toLocaleDateString() });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  taskInput.value = "";
+  renderTasks();
 });
+
+
+clearBtn.addEventListener("click", () => {
+    tasks = []; 
+    localStorage.removeItem("tasks");
+    renderTasks();
+});
+
+taskInput.addEventListener("keyup", (e) => {
+  if (e.key === "Enter") addTaskBtn.click();
+});
+renderTasks();
+

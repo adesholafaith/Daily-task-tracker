@@ -47,7 +47,7 @@ body {
     margin-right: 20px;
 }
 
-button {
+.task-button {
     width: 16%;
     height: 38px;
     cursor: pointer;
@@ -62,13 +62,6 @@ button {
     align-items: center;
 }
 
-input[type="checkbox"] {
-    cursor: pointer;
-    margin-right: 10px;
-    width: 30px;
-    height: 25px;
-}
-
 ul li {
     list-style: none;
     font-size: 18px;
@@ -80,15 +73,33 @@ li {
     display: flex;
     align-items: center;
     background: #edeef0;
+    width: 92%;
     margin-bottom: 10px;
+    margin-left: 20px;
     border-radius: 5px;
+    justify-content: space-between;
+}
+
+.clear-button {
+    position: absolute;
+    bottom: 15%;
+    left: 61%;
+    width: 6%;
+    height: 38px;
+    cursor: pointer;
+    background: rgb(51, 54, 51);
+    color: #fff;
+    border-radius: 40px;
+}
+
+.edit-icon {
+    width: 30px;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
 .edit-input {
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    padding: 5px;
-    font-size: 16px;
-    width: 80%;
-    outline: none;
+    flex: 1;
+    padding: 4px;
+    margin-right: 10px;
 }
